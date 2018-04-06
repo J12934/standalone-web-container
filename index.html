@@ -1,0 +1,57 @@
+<html>
+<head>
+    <link rel="stylesheet" href="./node_modules/reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="./node_modules/reveal.js/css/theme/white.css">
+</head>
+<body>
+<div class="reveal">
+    <div id="contents" class="slides">
+    </div>
+</div>
+<script src="./node_modules/reveal.js/js/reveal.js"></script>
+<script src="./node_modules/reveal.js/plugin/markdown/marked.js"></script>
+<script src="./node_modules/reveal.js/plugin/markdown/markdown.js"></script>
+<script src="./node_modules/marked/marked.min.js"></script>
+<script>
+
+    Reveal.initialize({});
+
+    /**
+     * Builds the complete presentation.
+     * @param {string} url the url of the markdown article
+     */
+    buildPresentation = function (url) {
+        fetch(url).then((response) => {
+            return response.text();
+        }).then((markdown) => {
+            const slides = markdown.split('[//]: <> (divider)');
+            slides.forEach((slide) => addSlide(slide));
+            Reveal.sync();
+            Reveal.slide(0);
+        }).catch((error) => {
+            console.log('Failed to fetch configuration with %o', error);
+        });
+    };
+
+    /**
+     * Adds a slide to the reveal presentation.
+     * @param {string} markdown the slide content as markdown
+     */
+    addSlide = function (markdown) {
+        let section = document.createElement('section');
+        document.getElementById('contents').appendChild(section);
+        section.innerHTML = marked(markdown);
+    };
+
+    // fetch configuration and init slides
+    fetch('/app-configuration').then((response) => {
+        return response.json();
+    }).then((configuration) => {
+        buildPresentation(configuration.articleUrl);
+    }).catch((error) => {
+        console.log('Failed to fetch configuration with %o', error);
+    });
+    // buildPresentation('content/article.md');
+</script>
+</body>
+</html>

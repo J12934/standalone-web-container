@@ -1,0 +1,11 @@
+{
+  "name": "standalone-web-container",
+  "version": "1.0.0",
+  "description": " A short introduction how to provide web configuration without an extra backend for frontend based on Docker.",
+  "author": "marko.ruehle@iteratec.de",
+  "license": "MIT",
+  "dependencies": {
+    "marked": "^0.3.19",
+    "reveal.js": "3.6.0"
+  }
+}
