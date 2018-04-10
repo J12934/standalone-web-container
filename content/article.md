@@ -4,7 +4,7 @@ How to provide configurations for a web application without requiring an extra s
 [//]: <> (divider)
 
 ### Introduction
-In fact of it's natural the web assets are static. Therefore necessary configurations e.g. links to other systems must 
+Web assets are static. Therefore necessary configurations e.g. links to other systems must 
 be compiled into the code at build time or could be dynamically loaded via a ReST resource at runtime. 
 
 [//]: <> (divider)
@@ -90,7 +90,7 @@ server {
 
 [//]: <> (divider)
 
-### How do we can replace the placeholder on start up?
+### How do we can replace this on start up?
 The configured placeholder will be not resolved out of the box. To do this let's take a look to the following 
 Dockerfile. 
 
