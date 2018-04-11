@@ -3,9 +3,15 @@ How to provide configurations for a web application without requiring an extra s
 
 [//]: <> (divider)
 
-### Introduction
-Web assets are static. Therefore necessary configurations e.g. links to other systems must 
-be compiled into the code at build time or could be dynamically loaded via a ReST resource at runtime. 
+### The entry point
+Imagine that we have a small web application which needs some configuration properties e.g. links to other systems.
+
+[//]: <> (divider)
+
+### Which possibilities do we have?
+At least we have two possibilities to serve configuration data. 
+* Compile the configuration directly into the app
+* Load configuration via a ReST resource at runtime
 
 [//]: <> (divider)
 
@@ -16,8 +22,7 @@ requires an system which provides that.
 [//]: <> (divider)
 
 ### The dilemma
-Therefore both solutions not really applicable to small static web applications with only some configurable 
-dependencies to other systems.
+Therefore both solutions not really applicable to small web applications with only some configurable properties.
  
 [//]: <> (divider)
 
@@ -30,8 +35,7 @@ dependencies to other systems.
 [//]: <> (divider)
 
 ### What do we can do?
-A possible way is to combine both options and provide the configuration via the web server which serves the web 
-application. For example a Nginx. 
+We provide the configuration via the web server which serves the web application!
 
 [//]: <> (divider)
 
@@ -39,39 +43,19 @@ application. For example a Nginx.
 
 [//]: <> (divider)
 
-### First of all
-We need a minimal Nginx configuration which configures a static resource that provides the application configuration.
-```
-server {
-    listen 80;
-    server_name localhost;
-    ...
-    location / {
-        root /usr/share/nginx/html;
-        index index.html index.htm;
-    }
-    location /app-configuration {
-        default_type application/json;
-        return 200 '{\"url\":\"https://www.iteratec.de/\"}';
-    }
-}
-```
+### What do we need?
 
-[//]: <> (divider)
- 
-But in the end of the day this setup is really similar to compiling the configuration into the static assets. 
-
-Some one must be hard coded the configuration into the web server.
+Only a handful of peaces.
+* A server configuration file (e.g. Nginx), ...
+* ... a Dockerfile, ...
+* ... perhaps docker-compose stack ...
+* ... and at least some **magic**!
 
 [//]: <> (divider)
 
-*What we want is to be able set the configuration properties dynamically at start up of the web server!* 
-
-[//]: <> (divider)
-
-### Make the resource dynamical
-Let's change the Nginx configuration to the following and configure a placeholder as return value of the 
-resource endpoint.
+### The web server configuration
+Let's configure the web server and add a resource which provides the configuration. 
+Take your eyes on the placeholder `${APP_CONFIG}`.
 ```
 server {
     listen 80;
@@ -90,16 +74,8 @@ server {
 
 [//]: <> (divider)
 
-### How do we can replace this on start up?
-The configured placeholder will be not resolved out of the box. To do this let's take a look to the following 
-Dockerfile. 
-
-The important keyword is `envsubst`!  
-
-[//]: <> (divider)
-### Using variable substitution
-With the command `envsubst` it's possible to replace the placeholder within the Nginx configuration with the value of
- identically named environment variable.
+### The dockerfile
+Now we must write a Dockerfile which bundles the web application into the web server.
 ```dockerfile
 FROM nginx:latest
 ADD ./nginx-setup/default.conf /tmp/template.conf
@@ -114,16 +90,34 @@ CMD envsubst < /tmp/template.conf \
     > /etc/nginx/conf.d/default.conf \
     && nginx -g 'daemon off;'
 ```
+
 [//]: <> (divider)
 
-### What will be happen?
+### Where is the magic?
+The placeholder in the Nginx configuration will be not resolved out of the box. For this we use `envsubst`!
+
+[//]: <> (divider)
+
+### What do we achieve with 'envsubst'?
+`envsubst` is be able to replaces placeholder within files with the value of identically named environment variables.
+```dockerfile
+...
+CMD envsubst < /tmp/template.conf \
+    > /etc/nginx/conf.d/default.conf \
+    && nginx -g 'daemon off;'
+...
+```
+
+[//]: <> (divider)
+
+### What will be finally happen?
 If we build and run the docker container then the placeholder will be replaced with the environment variable
- and afterwards automatically served by the web server like a static resource. This behaviour repeats each time the 
- container will be restart.
+ and afterwards automatically served by the web server like a static resource.
  
 [//]: <> (divider)
  
-To get a running example e.g. use docker-compose.  
+### Demonstrate it!
+To get a running example we can use docker-compose.
 ```yaml
 version: '2'
 services:
@@ -136,23 +130,32 @@ services:
     environment:
       - APP_CONFIG='{"articleUrl":"content/article.md"}'
 ```
+[//]: <> (divider)
+
+If we start the docker container the Nginx configuration will be replaced and used to configure the starting Nginx!
+```
+server {
+    ...
+    location /app-configuration {
+        default_type application/json;
+        return 200 '{"articleUrl":"content/article.md"}';
+    }
+}
+```
 
 [//]: <> (divider)
 
-### A short flashback
-What must do we do to achieve a the standalone web application container?
+### What are the benefits?
+
+* We don't need an extra backend service which provides the configuration
+* We don't need an extra build to change the configuration
+* We can be easily modify and inject the configuration into the context using environment variables
+* We can easily integrate this technique into a managed container platform like Kubernetes 
 
 [//]: <> (divider)
 
-* define a custom web server configuration which provides a static resource with a placeholder that could be replaced
-* write a Dockerfile which defines the replacement on web server start up
-* run a Docker container and provides the environment variable for replacement on web server start up 
-
-[//]: <> (divider)
-
-### You want to see this in action?
+### You want to try it yourself?
  
 Checkout [iteratec on GitHub](https://github.com/iteratec/standalone-web-container)
-
 
 ## ENJOY!
