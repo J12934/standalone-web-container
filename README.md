@@ -13,7 +13,7 @@ Fazit: Nur um Konfigurationen für eine Web Applikationen bereitzustellen, macht
 
 DOCH! Warum konfigurieren wir nicht den Web Server, welcher die Web Applikation ausliefert, so das dieser die nötigen Konfigurationen für die Web Applikation dynamisch unter einer festen ReST Resource anbietet! Ziel ist also ein Docker Container, welcher zum Startzeitpunkt eine gegebene Konfiguration entgegen nimmt und anschließend für die Web Applikation bereitstellt. Um dieses Ziel zu erreichen sind nur ein paar wenige Puzzle Teile nötig. Lasst uns schauen welche!
 
-Starten wir mit der richtigen Konfiguration des Web Servers beispielsweise eines Nginx. Neben der Auslieferung der statischen Assets für die Web Applikation müssen wir zusätzlich dafür gesorgen, dass eine Resource definiert wird, welche zur Laufzeit des Web Servers die Konfiguration für die Web Applikation ausliefert. Wichtig dabei ist, dass wir die Konfiguration erst dynamisch zum Container Startzeitpunkt festlegen wollen. Daher wird zunächst ein Platzhalter `${APP_CONFIG}` als Rückgabe definiert. Beispielhaft dafür ist die folgende `server.conf`.
+Starten wir mit der richtigen Konfiguration des Web Servers beispielsweise eines Nginx. Neben der Auslieferung der statischen Assets für die Web Applikation müssen wir zusätzlich dafür sorgen, dass eine Resource definiert wird, welche zur Laufzeit des Web Servers die Konfiguration für die Web Applikation ausliefert. Wichtig dabei ist, dass wir die Konfiguration erst dynamisch zum Container Startzeitpunkt festlegen wollen. Daher wird zunächst ein Platzhalter `${APP_CONFIG}` als Rückgabe definiert. Beispielhaft dafür ist die folgende `server.conf`.
 
 ```
 server {
@@ -74,6 +74,6 @@ Durch diesen Kniff liefert unser Server unter der Resource `/app-configuration` 
 
 #### Was sind die Vorteile?
 
-Besonders für eigenständige und kleine Mirco-Frontends bietet sich diese Vorgehensweise an. Bei gleichbleibender Flexibilität und starker Entkopplung zur Web Applikation wird kein zusätzliches Backend System benötigt. Auch ein zusätzlicher Buildprozess ist nicht zwingend nötig, da die Konfiguration über Umgebungsvariablen in den Container gereicht werden. Beispielsweise auf einer Kubernetes Umgebung können durch ein "Zero-Downtime" Deployments die Container rollierend ausgetauscht und somit ohne Ausfallzeit die Konfiguration für die Web Applikation geändert werden. Alles was man dafür benötigt ist eine modifizierte Web Server Konfiguration und ein intelligentes Dockerfile! 
+Besonders für eigenständige und kleine Mirco-Frontends bietet sich diese Vorgehensweise an. Bei gleichbleibender Flexibilität und starker Entkopplung zur Web Applikation wird kein zusätzliches Backend System benötigt. Auch ein zusätzlicher Buildprozess ist nicht zwingend nötig, da die Konfiguration über Umgebungsvariablen in den Container gereicht werden. Beispielsweise auf einer Kubernetes Umgebung können durch ein "Zero-Downtime" Deployment die Container rollierend ausgetauscht und somit ohne Ausfallzeit die Konfiguration für die Web Applikation geändert werden. Alles was man dafür benötigt ist eine modifizierte Web Server Konfiguration und ein intelligentes Dockerfile! 
 
 Probiere es selbst mit unserem Beispiel bei [Github](https://github.com/iteratec/standalone-web-container). 
