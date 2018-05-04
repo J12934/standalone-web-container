@@ -1,5 +1,5 @@
 ### Standalone web application container
-How to provide configurations for a web application without requiring an extra system for this propose
+How to provide configurations for a web application without requiring an extra system for this purpose
 
 [//]: <> (divider)
 
@@ -49,7 +49,7 @@ Only a handful of peaces.
 * A server configuration file (e.g. Nginx), ...
 * ... a Dockerfile, ...
 * ... perhaps docker-compose stack ...
-* ... and at least some **magic**!
+* ... and last but not least some **magic**!
 
 [//]: <> (divider)
 
